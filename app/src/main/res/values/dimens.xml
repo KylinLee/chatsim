@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="notification_large_icon_size">72dp</dimen>
+    <dimen name="bigger_avatar_size">64dp</dimen>
+    <dimen name="play_outline_size">36dp</dimen>
+    <dimen name="attachment_preview_size">64dp</dimen>
+    <dimen name="attachment_preview_min_height">@dimen/attachment_preview_size</dimen>
+    <dimen name="attachment_preview_max_width">156dp</dimen>
+    <dimen name="remove_attachment_size">24dp</dimen>
+    <dimen name="pin_icon_size">15dp</dimen>
+    <dimen name="vcard_property_start_margin">64dp</dimen>
+    <dimen name="small_icon_size">20dp</dimen>
+    <dimen name="medium_icon_size">36dp</dimen>
+    <dimen name="attachment_button_height">96dp</dimen>
+    <dimen name="attachment_button_width">90dp</dimen>
+    <dimen name="default_keyboard_height">250dp</dimen>
+
+    <dimen name="dialpad_button_size">60dp</dimen>
+    <dimen name="dialpad_button_size_small">50dp</dimen>
+    <dimen name="incoming_call_arrow_size">50dp</dimen>
+    <dimen name="incoming_call_button_size">72dp</dimen>
+    <dimen name="call_notification_button_size">40dp</dimen>
+    <dimen name="incoming_call_avatar_size">120dp</dimen>
+
+    <dimen name="caller_name_text_size">34sp</dimen>
+    <dimen name="call_status_text_size">20sp</dimen>
+
+    <!-- keep these 2 values in dp to avoid scaling -->
+    <dimen name="dialpad_text_size">28dp</dimen>
+    <dimen name="dialpad_letters_text_size">12dp</dimen>
+
+    <!-- Migrated from Simple-Commons -->
+    <dimen name="activity_margin">16dp</dimen>
+    <dimen name="bigger_text_size">16sp</dimen>
+    <dimen name="list_avatar_size">40dp</dimen>
+    <dimen name="small_margin">4dp</dimen>
+    <dimen name="normal_icon_size">48dp</dimen>
+</resources>

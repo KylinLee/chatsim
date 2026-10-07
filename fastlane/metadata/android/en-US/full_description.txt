@@ -1,0 +1,36 @@
+ChatS IM is an open-source SMS, MMS and phone app built around a virtual-number ("role") system: use several numbers for messages and calls on a single SIM, useful for carrier multi-number services.
+
+Messages
+• Conversation list grouped by role, with unread badges and pinning
+• Chat timeline merging SMS/MMS messages and call history
+• Scheduled messages and direct reply from notifications
+• User rules: add tags, block, or move to the recycle bin by phone number, role, content, SMS or call record
+• Recycle bin with optional automatic cleanup
+• Delivery reports
+• Import and export of messages and call history
+
+Calls
+• Call log with automatic grouping of consecutive calls from the same number
+• Incoming call screen and dialer, with call history merged into conversations
+
+Roles (virtual numbers)
+• Every role has its own message prefix and call prefix
+• Outgoing messages and calls automatically use the matching prefix
+• Incoming messages and calls are recognized by their prefix and assigned to the role
+• Multiple roles, per-role SIM binding and quick switching
+
+Contacts
+• Contact list with account-source filter, groups, pinned contacts and last-contacted time
+• Editable contact details and SIM card import
+
+Interface
+• Material 3 with dynamic color, light and dark theme
+• Bottom tabs on phones, navigation rail on large screens
+• English and Simplified Chinese
+
+Privacy
+• No ads, no trackers, no network permission; fully open source (GPL-3.0)
+
+Not supported: RCS/5G messages, sending MMS, call recording, caller-location lookup.
+
+Note: to work as your default SMS and phone app, the app needs the corresponding system permissions.

@@ -1,0 +1,5 @@
+ * First release of ChatS IM
+ * SMS, MMS and calls with virtual-number roles (separate message and call prefixes)
+ * User rules: tags, block and move to recycle bin
+ * Scheduled messages, delivery reports and recycle bin with automatic cleanup
+ * Contact groups, account filtering and SIM card import

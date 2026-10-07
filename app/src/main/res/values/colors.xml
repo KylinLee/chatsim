@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ripple_foreground">#33FFFFFF</color>
+    <color name="call_decline">#F44336</color>
+    <color name="call_accept">#4CAF50</color>
+    <color name="color_primary">#FF8F4C38</color>
+</resources>
