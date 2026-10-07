@@ -61,6 +61,7 @@ ChatS IM 的目标就是补上这一块：
 
 - 正式发行版在 [GitHub Releases](https://github.com/KylinLee/chatsim/releases) 发布，由 [`.github/workflows/release.yml`](.github/workflows/release.yml) 在推送 `v*` 标签时自动构建并签名；版本号以分支上的 `release(<major.minor.patch>): <description>` 提交为准。
 - 每个 APK 均附带 `.sha256` 校验文件；签名证书的 SHA-256 / SHA-1 指纹与校验方法见 [SIGNING.md](SIGNING.md)。
+- 推荐使用 [Obtainium](https://github.com/ImranR98/Obtainium) 追踪更新，它会直接读取本项目的 GitHub Releases 并提示安装新版本。
 
 ## 贡献
 
