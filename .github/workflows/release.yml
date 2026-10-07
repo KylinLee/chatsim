@@ -55,6 +55,22 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Use canonical Maven repositories
+        run: |
+          cat > "$RUNNER_TEMP/ci-repos.init.gradle" <<'EOF'
+          settingsEvaluated { settings ->
+              settings.pluginManagement.repositories.clear()
+              settings.pluginManagement.repositories.gradlePluginPortal()
+              settings.pluginManagement.repositories.google()
+              settings.pluginManagement.repositories.mavenCentral()
+              settings.pluginManagement.repositories.jitpack()
+              settings.dependencyResolutionManagement.repositories.clear()
+              settings.dependencyResolutionManagement.repositories.google()
+              settings.dependencyResolutionManagement.repositories.mavenCentral()
+              settings.dependencyResolutionManagement.repositories.jitpack()
+          }
+          EOF
+
       - name: Restore signing keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -79,6 +95,7 @@ jobs:
           ./gradlew assembleCoreRelease assembleFdroidRelease \
             -PappVersionName=${{ steps.version.outputs.version }} \
             -PappVersionCode=${{ steps.version.outputs.code }} \
+            --init-script "$RUNNER_TEMP/ci-repos.init.gradle" \
             --no-daemon --stacktrace
 
       - name: Collect artifacts
