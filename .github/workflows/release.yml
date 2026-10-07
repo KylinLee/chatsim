@@ -63,11 +63,11 @@ jobs:
               settings.pluginManagement.repositories.gradlePluginPortal()
               settings.pluginManagement.repositories.google()
               settings.pluginManagement.repositories.mavenCentral()
-              settings.pluginManagement.repositories.jitpack()
+              settings.pluginManagement.repositories.maven { url = 'https://jitpack.io' }
               settings.dependencyResolutionManagement.repositories.clear()
               settings.dependencyResolutionManagement.repositories.google()
               settings.dependencyResolutionManagement.repositories.mavenCentral()
-              settings.dependencyResolutionManagement.repositories.jitpack()
+              settings.dependencyResolutionManagement.repositories.maven { url = 'https://jitpack.io' }
           }
           EOF
 
