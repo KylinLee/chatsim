@@ -57,6 +57,11 @@ ChatS IM 的目标就是补上这一块：
 - **合规使用**：请遵守当地法律法规与运营商服务条款，不得将本应用用于发送垃圾信息、骚扰或欺诈。
 - **无担保**：本项目按「现状」提供，不附带任何明示或默示担保。
 
+## 发行版与验证
+
+- 正式发行版在 [GitHub Releases](https://github.com/KylinLee/chatsim/releases) 发布，由 [`.github/workflows/release.yml`](.github/workflows/release.yml) 在推送 `v*` 标签时自动构建并签名；版本号以分支上的 `release(<major.minor.patch>): <description>` 提交为准。
+- 每个 APK 均附带 `.sha256` 校验文件；签名证书的 SHA-256 / SHA-1 指纹与校验方法见 [SIGNING.md](SIGNING.md)。
+
 ## 贡献
 
 - **只接受两类 PR**：bug 修复与安全漏洞修复。提交时请说明问题、复现步骤与验证结果。
@@ -82,4 +87,5 @@ ChatS IM 的目标就是补上这一块：
 | [docs/rule-engine-design.md](docs/rule-engine-design.md) | 内置规则引擎与用户规则（角色解析、标签、拦截） |
 | [docs/scheduler.md](docs/scheduler.md) | 持久化定时任务调度（定时消息、回收站自动清空） |
 | [AGENTS.md](AGENTS.md) | 仓库协作与实现约定 |
+| [SIGNING.md](SIGNING.md) | 发布 APK 的签名证书指纹与校验方法 |
 | [CHANGELOG.md](CHANGELOG.md) | 版本变更记录 |
