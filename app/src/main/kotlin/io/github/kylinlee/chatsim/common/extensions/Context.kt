@@ -13,6 +13,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.net.Uri
+import android.os.Build
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
@@ -849,14 +851,37 @@ fun Context.markThreadMessagesUnread(threadId: Long) {
 }
 
 fun Context.updateUnreadCountBadge(conversations: List<Conversation>) {
+    val unreadCount = conversations.count { !it.read }
     try {
-        val unreadCount = conversations.count { !it.read }
         if (unreadCount == 0) {
             ShortcutBadger.removeCount(this)
         } else {
             ShortcutBadger.applyCount(this, unreadCount)
         }
     } catch (ignored: Exception) {
+    }
+    applyColorOsBadge(unreadCount)
+}
+
+/**
+ * ColorOS/OnePlus/realme 桌面使用 com.android.badge provider，
+ * 但 ShortcutBadger 只匹配 com.oppo.launcher，无法覆盖 com.android.launcher。
+ */
+private fun Context.applyColorOsBadge(unreadCount: Int) {
+    val manufacturer = Build.MANUFACTURER.orEmpty().lowercase()
+    val brand = Build.BRAND.orEmpty().lowercase()
+    val isColorOs = manufacturer in setOf("oppo", "oneplus", "realme") ||
+        brand in setOf("oppo", "oneplus", "realme")
+    if (!isColorOs) return
+
+    runCatching {
+        val extras = Bundle().apply { putInt("app_badge_count", unreadCount) }
+        contentResolver.call(
+            Uri.parse("content://com.android.badge/badge"),
+            "setAppBadgeCount",
+            null,
+            extras,
+        )
     }
 }
 
