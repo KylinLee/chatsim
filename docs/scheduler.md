@@ -3,7 +3,7 @@
 - 状态：已实现（`SEND_MESSAGE`、`EMPTY_RECYCLE_BIN`）
 - 日期：2026-09-28
 - 适用仓库：`dial&sms`（`src`）
-- 依赖：`AlarmManager` + Room（未使用 WorkManager / JobScheduler）
+- 依赖：`AlarmManager` + `JobScheduler` + Room（未使用 WorkManager）
 
 ---
 
@@ -22,6 +22,7 @@
 11. [文件清单](#11-文件清单)
 12. [测试](#12-测试)
 13. [已知限制与约定](#13-已知限制与约定)
+14. [后台保活与自愈](#14-后台保活与自愈)
 
 ---
 
@@ -218,6 +219,15 @@ else
 | `data/scheduler/SendMessageTaskHandler.kt` | 发送定时短信（走规则引擎出站路由） |
 | `data/scheduler/EmptyRecycleBinTaskHandler.kt` | 清空回收站并排下一次 |
 | `data/scheduler/RecycleBinCleanScheduler.kt` | 单例回收站任务的 ensure / clear |
+| `data/scheduler/ReconcileScheduler.kt` | JobScheduler 周期对账兜底 |
+| `data/scheduler/ReconcileJobService.kt` | 周期对账 JobService |
+| `domain/scheduler/ReconcileTrigger.kt` | 触发对账的系统事件判定 |
+| `background/ScheduledSendService.kt` | 定时发送窗口的短时前台服务 |
+| `background/KeepAliveService.kt` | 可选的常驻通知保活服务 |
+| `background/KeepAliveActionReceiver.kt` | 通知栏「停止保活」 |
+| `domain/background/BackgroundStatus.kt` | 后台可靠性状态与缺失项 |
+| `data/background/BackgroundStatusProvider.kt` | 读取系统能力状态 |
+| `data/background/BackgroundIntents.kt` | 电池优化/自启动/闹钟/通知设置入口 |
 | `background/ScheduledTaskReceiver.kt` | 闹钟触发入口（goAsync + WakeLock） |
 | `background/BootReceiver.kt` | 开机/应用更新后对账 |
 | `repository/ScheduledTaskRepository.kt` + `data/repository/ScheduledTaskRepositoryImpl.kt` | 仓库 |
@@ -241,5 +251,28 @@ else
 - 过期任务**不补发**（标记失败），回收站自动清空顺延到下一周期；
 - 无自动重试：任务失败即终态，失败原因记录在 `last_error`，失败气泡可由用户手动删除；
 - `PendingIntent` requestCode 取 `taskId.toInt()`，新增任务类型时必须保证 id 不冲突；
-- 对账只在 App 启动与开机/应用更新时进行；闹钟本身由 AlarmManager 触发，不依赖进程常驻；
+- 对账在 App 启动、前台恢复、开机/应用更新、时间变更以及每 6 小时的 JobScheduler 任务中执行；闹钟本身由 AlarmManager 触发，不依赖进程常驻；
 - 改 `scheduled_tasks` 表结构必须升 Room 版本并写迁移（见 [developer-guide.md](developer-guide.md)）。
+
+## 14. 后台保活与自愈
+
+应用不常驻进程，后台可靠性按「低成本优先」分层，常驻通知保活是最后手段：
+
+| 层级 | 实现 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| T0 系统能力引导 | 设置 → 后台与保活 | 开启 | 电池优化、自启动、精确闹钟、通知权限、默认短信/拨号状态与跳转 |
+| T1 闹钟自愈 | `BootReceiver` + `ReconcileScheduler` | 开启 | 开机/应用更新/时间变更时对账；每 6 小时 JobScheduler 兜底重排 |
+| T2 发送窗口提权 | `ScheduledSendService` | 自动 | 定时短信触发时以 `shortService` 前台服务完成发送，结束即停 |
+| T3 常驻保活 | `KeepAliveService` | **关闭** | 用户显式开启后以常驻通知提升进程优先级，最后手段 |
+
+- **T0**：`BackgroundStatus`（`domain/background/BackgroundStatus.kt`）汇总状态，`readBackgroundStatus()`（`data/background/BackgroundStatusProvider.kt`）读取系统能力；`BackgroundIntents` 提供电池优化、自启动（按厂商 best-effort）、精确闹钟、通知设置入口。电池优化使用 `ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` 直接请求。
+- **T1**：`ReconcileTrigger`（domain）定义触发对账的 action；`ReconcileScheduler` 注册 `setPersisted(true)` + `setPeriodic(6h)` 的 Job，`ReconcileJobService` 执行 `TaskScheduler.reconcile` 与 `RecycleBinCleanScheduler.ensure`；`MainActivity.onResume` 也做一次前台对账。对账结果写入 `Config.lastReconcileAt`，设置页显示「上次后台自愈」。
+- **错过提醒**：对账把 `SEND_MESSAGE` 标记为失败时，发一条「定时消息未发送」通知（`NotificationHelper.showScheduledMessageMissedNotification`）。
+- **T2**：`TaskScheduler` 在闹钟 PendingIntent 里带 `TASK_TYPE`；`ScheduledTaskReceiver` 仅对 `SEND_MESSAGE` 启动 `ScheduledSendService`（`shortService`），发送结束 `stopService`。
+- **T3**：`Config.keepAliveEnabled` 默认 `false`，设置页开关；`KeepAliveService` 使用 `specialUse` 前台服务与低优先级常驻通知，通知内提供「停止」动作（`KeepAliveActionReceiver` 关闭并停止服务）；`App.onCreate`、`MainActivity`、`BootReceiver` 按开关恢复。
+
+注意：
+- 精确闹钟权限缺失时 T1 仍会降级为不精确闹钟；
+- `shortService` 有时长上限，发送应在窗口内完成；
+- `specialUse` 前台服务不保证对抗所有 OEM 冻结，仅作为最后手段。
+
