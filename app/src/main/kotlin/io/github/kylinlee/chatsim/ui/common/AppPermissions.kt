@@ -69,7 +69,7 @@ fun RequestAppPermissions() {
     }
 }
 
-private fun defaultSmsRoleIntent(context: Context): Intent? {
+internal fun defaultSmsRoleIntent(context: Context): Intent? {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         val roleManager = context.getSystemService(RoleManager::class.java)
         if (roleManager.isRoleAvailable(RoleManager.ROLE_SMS) && !roleManager.isRoleHeld(RoleManager.ROLE_SMS)) {
@@ -82,7 +82,7 @@ private fun defaultSmsRoleIntent(context: Context): Intent? {
     return null
 }
 
-private fun defaultDialerRoleIntent(context: Context): Intent? {
+internal fun defaultDialerRoleIntent(context: Context): Intent? {
     val telecomManager = context.getSystemService(TelecomManager::class.java)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         val roleManager = context.getSystemService(RoleManager::class.java)

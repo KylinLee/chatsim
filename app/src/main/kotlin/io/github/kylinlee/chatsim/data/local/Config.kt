@@ -170,6 +170,10 @@ class Config(context: Context) {
         get() = prefs.getInt(CALL_OVERLAY_Y, -1)
         set(callOverlayY) = prefs.edit().putInt(CALL_OVERLAY_Y, callOverlayY).apply()
 
+    var keepAliveEnabled: Boolean
+        get() = prefs.getBoolean(KEEP_ALIVE_ENABLED, false)
+        set(keepAliveEnabled) = prefs.edit().putBoolean(KEEP_ALIVE_ENABLED, keepAliveEnabled).apply()
+
     var nameSeparator: String
         get() = prefs.getString(NAME_SEPARATOR, DEFAULT_NAME_SEPARATOR) ?: DEFAULT_NAME_SEPARATOR
         set(nameSeparator) = prefs.edit().putString(NAME_SEPARATOR, nameSeparator).apply()

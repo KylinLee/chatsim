@@ -19,6 +19,7 @@ const val HIDE_DIALPAD_NUMBERS = "hide_dialpad_numbers"
 const val CALL_OVERLAY = "call_overlay"
 const val CALL_OVERLAY_X = "call_overlay_x"
 const val CALL_OVERLAY_Y = "call_overlay_y"
+const val KEEP_ALIVE_ENABLED = "keep_alive_enabled"
 const val NAME_SEPARATOR = "name_separator"
 
 const val TAB_CONTACTS = 1
@@ -32,6 +33,7 @@ val tabsList = arrayListOf(TAB_CONTACTS, TAB_CALL_HISTORY, TAB_MESSAGES)
 private const val ACTION_PATH = "io.github.kylinlee.chatsim.action."
 const val ACCEPT_CALL = ACTION_PATH + "accept_call"
 const val DECLINE_CALL = ACTION_PATH + "decline_call"
+const val STOP_KEEP_ALIVE = ACTION_PATH + "stop_keep_alive"
 
 const val DIALPAD_TONE_LENGTH_MS = 150L // The length of DTMF tones in milliseconds
 

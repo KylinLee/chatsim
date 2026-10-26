@@ -95,6 +95,12 @@ class SettingsRepositoryImpl @Inject constructor(
             config.callOverlay = value
         }
 
+    override var keepAliveEnabled: Boolean
+        get() = config.keepAliveEnabled
+        set(value) {
+            config.keepAliveEnabled = value
+        }
+
     override var useSimpleCharacters: Boolean
         get() = config.useSimpleCharacters
         set(value) {

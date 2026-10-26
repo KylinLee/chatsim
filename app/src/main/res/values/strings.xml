@@ -412,4 +412,31 @@
     <string name="telegram">Telegram</string>
     <string name="viber">Viber</string>
     <string name="phone_storage">Phone storage</string>
+
+    <!-- Background keep-alive -->
+    <string name="background_keep_alive">Background &amp; keep-alive</string>
+    <string name="background_health_ok">Background reliability looks good.</string>
+    <string name="background_health_issues">%1$d item(s) need attention.</string>
+    <string name="battery_optimization">Battery optimization</string>
+    <string name="auto_start">Auto-start / background limits</string>
+    <string name="exact_alarm_permission">Alarms &amp; reminders</string>
+    <string name="notification_permission">Notifications</string>
+    <string name="default_sms_role">Default SMS app</string>
+    <string name="default_dialer_role">Default phone app</string>
+    <string name="status_allowed">Allowed</string>
+    <string name="status_not_allowed">Not allowed</string>
+    <string name="status_default">Default</string>
+    <string name="status_not_default">Not default</string>
+    <string name="keep_alive_enabled">Persistent notification keep-alive</string>
+    <string name="keep_alive_summary">Last resort. Keeps a notification in the status bar to raise process priority.</string>
+    <string name="keep_alive_warning">Only enable this if scheduled messages or notifications are still unreliable after allowing background running. It increases battery usage.</string>
+    <string name="keep_alive_notification_channel">Background keep-alive</string>
+    <string name="keep_alive_notification_title">Keep-alive is running</string>
+    <string name="keep_alive_notification_text">ChatS IM stays in the background to deliver messages on time. Turn it off in Settings.</string>
+    <string name="keep_alive_stop">Stop</string>
+    <string name="scheduled_send_channel">Scheduled messages</string>
+    <string name="scheduled_send_notification_title">Sending scheduled message</string>
+    <string name="scheduled_send_notification_text">Sending in the background, please wait…</string>
+    <string name="scheduled_message_missed_title">Scheduled message not sent</string>
+    <string name="scheduled_message_missed_text">A scheduled message could not be sent because the device was off or the app was stopped.</string>
 </resources>

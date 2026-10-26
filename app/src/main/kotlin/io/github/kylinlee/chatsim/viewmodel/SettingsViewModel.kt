@@ -9,7 +9,10 @@ import android.provider.Settings
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.kylinlee.chatsim.background.KeepAliveService
+import io.github.kylinlee.chatsim.data.background.readBackgroundStatus
 import io.github.kylinlee.chatsim.data.events.AppEventBus
+import io.github.kylinlee.chatsim.domain.background.BackgroundStatus
 import io.github.kylinlee.chatsim.domain.model.AppEvent
 import io.github.kylinlee.chatsim.data.legacy.MessagesReader
 import io.github.kylinlee.chatsim.data.legacy.MessagesWriter
@@ -47,6 +50,8 @@ data class SettingsState(
     val dialpadMuted: Boolean = false,
     val hideDialpadNumbers: Boolean = false,
     val callOverlay: Boolean = true,
+    val keepAliveEnabled: Boolean = false,
+    val backgroundStatus: BackgroundStatus = BackgroundStatus(),
     val useSimpleCharacters: Boolean = false,
     val enableDeliveryReports: Boolean = false,
     val lockScreenVisibilitySetting: Int = 0,
@@ -129,6 +134,12 @@ class SettingsViewModel @Inject constructor(
         settings.callOverlay = enabled
         _state.value = _state.value.copy(callOverlay = enabled)
         eventBus.tryEmit(AppEvent.CallOverlayChanged)
+    }
+
+    fun setKeepAliveEnabled(enabled: Boolean) {
+        settings.keepAliveEnabled = enabled
+        _state.value = _state.value.copy(keepAliveEnabled = enabled)
+        KeepAliveService.sync(context, enabled)
     }
 
     fun setUseSimpleCharacters(enabled: Boolean) {
@@ -285,6 +296,8 @@ class SettingsViewModel @Inject constructor(
         dialpadMuted = settings.dialpadMuted,
         hideDialpadNumbers = settings.hideDialpadNumbers,
         callOverlay = settings.callOverlay,
+        keepAliveEnabled = settings.keepAliveEnabled,
+        backgroundStatus = context.readBackgroundStatus(),
         useSimpleCharacters = settings.useSimpleCharacters,
         enableDeliveryReports = settings.enableDeliveryReports,
         lockScreenVisibilitySetting = settings.lockScreenVisibilitySetting,

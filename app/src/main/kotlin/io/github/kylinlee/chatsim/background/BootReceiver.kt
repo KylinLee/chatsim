@@ -3,6 +3,7 @@ package io.github.kylinlee.chatsim.background
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import io.github.kylinlee.chatsim.common.extensions.config
 import io.github.kylinlee.chatsim.data.scheduler.RecycleBinCleanScheduler
 import io.github.kylinlee.chatsim.data.scheduler.TaskScheduler
 import kotlinx.coroutines.CoroutineScope
@@ -19,6 +20,7 @@ class BootReceiver : BroadcastReceiver() {
 
         val pendingResult = goAsync()
         val appContext = context.applicationContext
+        KeepAliveService.sync(appContext, appContext.config.keepAliveEnabled)
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

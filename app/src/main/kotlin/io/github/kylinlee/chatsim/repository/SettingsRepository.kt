@@ -18,6 +18,8 @@ interface SettingsRepository {
     var hideDialpadNumbers: Boolean
     var callOverlay: Boolean
 
+    var keepAliveEnabled: Boolean
+
     var useSimpleCharacters: Boolean
     var enableDeliveryReports: Boolean
     var lockScreenVisibilitySetting: Int

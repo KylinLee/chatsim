@@ -414,4 +414,31 @@
     <string name="telegram">Telegram</string>
     <string name="viber">Viber</string>
     <string name="phone_storage">手机存储</string>
+
+    <!-- Background keep-alive -->
+    <string name="background_keep_alive">后台与保活</string>
+    <string name="background_health_ok">后台可靠性良好。</string>
+    <string name="background_health_issues">有 %1$d 项需要处理。</string>
+    <string name="battery_optimization">电池优化</string>
+    <string name="auto_start">自启动 / 后台限制</string>
+    <string name="exact_alarm_permission">闹钟和提醒</string>
+    <string name="notification_permission">通知权限</string>
+    <string name="default_sms_role">默认短信应用</string>
+    <string name="default_dialer_role">默认电话应用</string>
+    <string name="status_allowed">已允许</string>
+    <string name="status_not_allowed">未允许</string>
+    <string name="status_default">已设为默认</string>
+    <string name="status_not_default">未设为默认</string>
+    <string name="keep_alive_enabled">常驻通知保活</string>
+    <string name="keep_alive_summary">最后手段。保留一条状态栏通知以提高进程优先级。</string>
+    <string name="keep_alive_warning">仅在允许后台运行后定时消息或通知仍不可靠时开启。会增加耗电。</string>
+    <string name="keep_alive_notification_channel">后台保活</string>
+    <string name="keep_alive_notification_title">后台保活运行中</string>
+    <string name="keep_alive_notification_text">ChatS IM 正在后台保持运行，以便准时送达消息。可在设置中关闭。</string>
+    <string name="keep_alive_stop">停止</string>
+    <string name="scheduled_send_channel">定时消息</string>
+    <string name="scheduled_send_notification_title">正在发送定时消息</string>
+    <string name="scheduled_send_notification_text">正在后台发送，请稍候…</string>
+    <string name="scheduled_message_missed_title">定时消息未发送</string>
+    <string name="scheduled_message_missed_text">有定时消息因设备关机或应用被终止而未能发送。</string>
 </resources>

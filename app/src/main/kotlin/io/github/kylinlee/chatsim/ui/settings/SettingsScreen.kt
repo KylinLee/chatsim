@@ -59,7 +59,12 @@ import io.github.kylinlee.chatsim.R
 import io.github.kylinlee.chatsim.common.LOCK_SCREEN_NOTHING
 import io.github.kylinlee.chatsim.common.LOCK_SCREEN_SENDER
 import io.github.kylinlee.chatsim.common.LOCK_SCREEN_SENDER_MESSAGE
+import io.github.kylinlee.chatsim.data.background.BackgroundIntents
+import io.github.kylinlee.chatsim.data.background.openBackgroundIntent
+import io.github.kylinlee.chatsim.domain.background.issues
 import io.github.kylinlee.chatsim.domain.scheduler.RECYCLE_BIN_CLEAN_PERIODS
+import io.github.kylinlee.chatsim.ui.common.defaultDialerRoleIntent
+import io.github.kylinlee.chatsim.ui.common.defaultSmsRoleIntent
 import io.github.kylinlee.chatsim.ui.common.isListDetailLayout
 import io.github.kylinlee.chatsim.viewmodel.SettingsViewModel
 import kotlin.math.roundToInt
@@ -240,6 +245,97 @@ fun SettingsScreen(
                     )
                 }
 
+                item { SectionHeader(stringResource(R.string.background_keep_alive)) }
+                item {
+                    val issues = state.backgroundStatus.issues()
+                    Text(
+                        text = if (issues.isEmpty()) {
+                            stringResource(R.string.background_health_ok)
+                        } else {
+                            stringResource(R.string.background_health_issues, issues.size)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (issues.isEmpty()) {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        } else {
+                            MaterialTheme.colorScheme.error
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                }
+                item {
+                    EntryRow(
+                        title = stringResource(R.string.battery_optimization),
+                        value = statusLabel(state.backgroundStatus.ignoringBatteryOptimizations),
+                        onClick = {
+                            context.openBackgroundIntent(BackgroundIntents.batteryOptimization(context))
+                        },
+                    )
+                }
+                item {
+                    EntryRow(
+                        title = stringResource(R.string.auto_start),
+                        value = "",
+                        onClick = { context.openBackgroundIntent(BackgroundIntents.autoStart(context)) },
+                    )
+                }
+                item {
+                    EntryRow(
+                        title = stringResource(R.string.exact_alarm_permission),
+                        value = statusLabel(state.backgroundStatus.canScheduleExactAlarms),
+                        onClick = {
+                            val intent = BackgroundIntents.exactAlarm(context)
+                                ?: BackgroundIntents.appDetails(context)
+                            context.openBackgroundIntent(intent)
+                        },
+                    )
+                }
+                item {
+                    EntryRow(
+                        title = stringResource(R.string.notification_permission),
+                        value = statusLabel(state.backgroundStatus.notificationsGranted),
+                        onClick = { context.openBackgroundIntent(BackgroundIntents.notifications(context)) },
+                    )
+                }
+                item {
+                    EntryRow(
+                        title = stringResource(R.string.default_sms_role),
+                        value = defaultRoleLabel(state.backgroundStatus.isDefaultSms),
+                        onClick = {
+                            val intent = defaultSmsRoleIntent(context)
+                                ?: BackgroundIntents.appDetails(context)
+                            context.openBackgroundIntent(intent)
+                        },
+                    )
+                }
+                item {
+                    EntryRow(
+                        title = stringResource(R.string.default_dialer_role),
+                        value = defaultRoleLabel(state.backgroundStatus.isDefaultDialer),
+                        onClick = {
+                            val intent = defaultDialerRoleIntent(context)
+                                ?: BackgroundIntents.appDetails(context)
+                            context.openBackgroundIntent(intent)
+                        },
+                    )
+                }
+                item {
+                    SwitchRow(
+                        title = stringResource(R.string.keep_alive_enabled),
+                        checked = state.keepAliveEnabled,
+                        onCheckedChange = viewModel::setKeepAliveEnabled,
+                        subtitle = stringResource(R.string.keep_alive_summary),
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(R.string.keep_alive_warning),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                }
+
                 item { SectionHeader(stringResource(R.string.recycle_bin)) }
                 item {
                     val recycleBinLocked = state.trashRuleCount > 0 || state.recycleBinMessagesCount > 0
@@ -414,6 +510,14 @@ private fun lockScreenVisibilityLabel(value: Int): String = stringResource(
         else -> io.github.kylinlee.chatsim.R.string.sender_and_message
     }
 )
+
+@Composable
+private fun statusLabel(allowed: Boolean): String =
+    stringResource(if (allowed) R.string.status_allowed else R.string.status_not_allowed)
+
+@Composable
+private fun defaultRoleLabel(isDefault: Boolean): String =
+    stringResource(if (isDefault) R.string.status_default else R.string.status_not_default)
 
 @Composable
 private fun SectionHeader(title: String) {
