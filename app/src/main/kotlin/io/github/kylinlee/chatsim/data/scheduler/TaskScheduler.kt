@@ -10,6 +10,7 @@ import androidx.core.app.AlarmManagerCompat
 import androidx.room.withTransaction
 import io.github.kylinlee.chatsim.background.ScheduledTaskReceiver
 import io.github.kylinlee.chatsim.common.TASK_ID
+import io.github.kylinlee.chatsim.common.TASK_TYPE
 import io.github.kylinlee.chatsim.common.extensions.config
 import io.github.kylinlee.chatsim.common.extensions.getMessagesDB
 import io.github.kylinlee.chatsim.common.extensions.notificationHelper
@@ -52,7 +53,7 @@ object TaskScheduler {
             Log.w(TAG, "task ${task.id} already exists, schedule skipped")
             return false
         }
-        registerAlarm(context, task.id, task.triggerAt)
+        registerAlarm(context, task.id, task.triggerAt, task.type.name)
         notifyConversationChanged(task.conversationId)
         return true
     }
@@ -148,7 +149,7 @@ object TaskScheduler {
         actions.forEach { action ->
             when (action) {
                 is TaskReconcileAction.RegisterAlarm ->
-                    registerAlarm(context, action.task.id, action.task.triggerAt)
+                    registerAlarm(context, action.task.id, action.task.triggerAt, action.task.type.name)
 
                 is TaskReconcileAction.Fail -> {
                     db.ScheduledTasksDao().markFailed(action.task.id, now, action.reason.name)
@@ -182,8 +183,8 @@ object TaskScheduler {
         }
     }
 
-    private fun registerAlarm(context: Context, taskId: Long, triggerAt: Long) {
-        val pendingIntent = getTaskPendingIntent(context, taskId)
+    private fun registerAlarm(context: Context, taskId: Long, triggerAt: Long, type: String) {
+        val pendingIntent = getTaskPendingIntent(context, taskId, type)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (isSPlus() && !alarmManager.canScheduleExactAlarms()) {
             AlarmManagerCompat.setAndAllowWhileIdle(alarmManager, AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
@@ -198,9 +199,10 @@ object TaskScheduler {
         PendingIntent.getBroadcast(context, taskId.toInt(), intent, flags)?.cancel()
     }
 
-    private fun getTaskPendingIntent(context: Context, taskId: Long): PendingIntent {
+    private fun getTaskPendingIntent(context: Context, taskId: Long, type: String): PendingIntent {
         val intent = Intent(context, ScheduledTaskReceiver::class.java)
             .putExtra(TASK_ID, taskId)
+            .putExtra(TASK_TYPE, type)
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         return PendingIntent.getBroadcast(context, taskId.toInt(), intent, flags)
     }

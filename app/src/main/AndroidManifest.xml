@@ -150,6 +150,12 @@
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <service
+            android:name="io.github.kylinlee.chatsim.background.ScheduledSendService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="shortService" />
+
         <receiver
             android:name="io.github.kylinlee.chatsim.background.KeepAliveActionReceiver"
             android:enabled="true"
