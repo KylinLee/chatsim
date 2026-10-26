@@ -35,15 +35,22 @@ jobs:
           else
             VERSION="${GITHUB_REF_NAME#v}"
           fi
-          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
             echo "::error::Invalid version: $VERSION"
             exit 1
           fi
-          IFS=. read -r MAJOR MINOR PATCH <<< "$VERSION"
+          BASE_VERSION="${VERSION%%-*}"
+          IFS=. read -r MAJOR MINOR PATCH <<< "$BASE_VERSION"
+          if [[ "$VERSION" == *-* ]]; then
+            PRERELEASE="true"
+          else
+            PRERELEASE="false"
+          fi
           {
             echo "version=$VERSION"
             echo "code=$((MAJOR * 10000 + MINOR * 100 + PATCH))"
             echo "tag=v$VERSION"
+            echo "prerelease=$PRERELEASE"
           } >> "$GITHUB_OUTPUT"
 
       - name: Set up JDK 17
@@ -152,7 +159,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          PRERELEASE_FLAG=""
+          if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
           gh release create "${{ steps.version.outputs.tag }}" \
             dist/*.apk dist/*.sha256 \
             --title "ChatS IM v${{ steps.version.outputs.version }}" \
-            --notes-file release-notes.md
+            --notes-file release-notes.md \
+            $PRERELEASE_FLAG
