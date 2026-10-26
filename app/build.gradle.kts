@@ -20,12 +20,16 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
-// 版本号唯一来源：分支上最新的 release(<major.minor.patch>): ... 提交；没有则回退 0.0.0 / versionCode 1。
+// 版本号唯一来源：分支上最新的 release(<major.minor.patch>): ... 提交；
+// git 不可用时回退到最新的 v<major.minor.patch> 标签；仍没有则回退 0.0.0 / versionCode 1。
 // 可用 -PappVersionName / -PappVersionCode 显式覆盖（例如脱离 git 的构建）。
 val releaseVersionPattern = Regex("""^release\(v?(\d+)\.(\d+)\.(\d+)\)""")
 
-val gitReleaseVersion: List<Int>? = runCatching {
-    providers.exec { commandLine("git", "log", "--format=%s") }
+val gitLogVersion: List<Int>? = runCatching {
+    providers.exec {
+        workingDir(rootProject.projectDir)
+        commandLine("git", "log", "--format=%s")
+    }
         .standardOutput.asText.get()
         .lineSequence()
         .mapNotNull { releaseVersionPattern.find(it.trim()) }
@@ -34,6 +38,21 @@ val gitReleaseVersion: List<Int>? = runCatching {
         ?.drop(1)
         ?.map { it.toInt() }
 }.getOrNull()
+
+val gitTagVersion: List<Int>? = runCatching {
+    providers.exec {
+        workingDir(rootProject.projectDir)
+        commandLine("git", "describe", "--tags", "--abbrev=0", "--match", "v[0-9]*")
+    }
+        .standardOutput.asText.get()
+        .trim()
+        .removePrefix("v")
+        .split(".")
+        .map { it.toInt() }
+        .takeIf { it.size == 3 }
+}.getOrNull()
+
+val gitReleaseVersion: List<Int>? = gitLogVersion ?: gitTagVersion
 
 val overrideVersionName: String? = providers.gradleProperty("appVersionName").orNull
 val overrideVersionCode: String? = providers.gradleProperty("appVersionCode").orNull
