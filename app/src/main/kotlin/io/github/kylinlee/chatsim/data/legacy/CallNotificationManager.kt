@@ -13,10 +13,10 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
 import android.telecom.Call
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.app.Person
+import androidx.core.graphics.drawable.IconCompat
 import io.github.kylinlee.chatsim.common.extensions.notificationManager
-import io.github.kylinlee.chatsim.common.extensions.setText
 import io.github.kylinlee.chatsim.common.isOreoPlus
 import io.github.kylinlee.chatsim.R
 import io.github.kylinlee.chatsim.background.CallActionReceiver
@@ -87,40 +87,35 @@ class CallNotificationManager(private val context: Context) {
                 else -> R.string.ongoing_call
             }
 
-            val collapsedView = RemoteViews(context.packageName, R.layout.call_notification).apply {
-                setText(R.id.notification_caller_name, callerName)
-                setText(R.id.notification_call_status, context.getString(contentTextId))
+            val personBuilder = Person.Builder()
+                .setName(callerName)
+                .setImportant(true)
+            if (callContactAvatar != null) {
+                personBuilder.setIcon(
+                    IconCompat.createWithBitmap(callContactAvatarHelper.getCircularBitmap(callContactAvatar))
+                )
+            }
+            val person = personBuilder.build()
 
-                if (callContactAvatar != null) {
-                    setImageViewBitmap(R.id.notification_thumbnail, callContactAvatarHelper.getCircularBitmap(callContactAvatar))
-                }
+            val callStyle = if (isRinging) {
+                NotificationCompat.CallStyle.forIncomingCall(person, declinePendingIntent, acceptPendingIntent)
+            } else {
+                NotificationCompat.CallStyle.forOngoingCall(person, declinePendingIntent)
             }
 
             val builder = NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_symbol_call)
                 .setContentIntent(openAppPendingIntent)
+                .setContentTitle(callerName)
+                .setContentText(context.getString(contentTextId))
                 .setPriority(if (isRinging) NotificationCompat.PRIORITY_HIGH else NotificationCompat.PRIORITY_DEFAULT)
                 .setCategory(Notification.CATEGORY_CALL)
-                .setCustomContentView(collapsedView)
+                .setStyle(callStyle)
                 .setOngoing(true)
                 .setSound(null)
                 .setOnlyAlertOnce(true)
                 .setUsesChronometer(callState == Call.STATE_ACTIVE)
                 .setChannelId(channelId)
-                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-
-            builder.addAction(
-                R.drawable.ic_symbol_call_end,
-                context.getString(if (isRinging) R.string.decline else R.string.hang_up),
-                declinePendingIntent,
-            )
-            if (isRinging) {
-                builder.addAction(
-                    R.drawable.ic_symbol_call,
-                    context.getString(R.string.answer),
-                    acceptPendingIntent,
-                )
-            }
 
             if (isRinging) {
                 builder.setFullScreenIntent(openAppPendingIntent, true)
