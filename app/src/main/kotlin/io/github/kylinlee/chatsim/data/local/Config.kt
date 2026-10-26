@@ -174,6 +174,10 @@ class Config(context: Context) {
         get() = prefs.getBoolean(KEEP_ALIVE_ENABLED, false)
         set(keepAliveEnabled) = prefs.edit().putBoolean(KEEP_ALIVE_ENABLED, keepAliveEnabled).apply()
 
+    var lastReconcileAt: Long
+        get() = prefs.getLong(LAST_RECONCILE_AT, 0L)
+        set(lastReconcileAt) = prefs.edit().putLong(LAST_RECONCILE_AT, lastReconcileAt).apply()
+
     var nameSeparator: String
         get() = prefs.getString(NAME_SEPARATOR, DEFAULT_NAME_SEPARATOR) ?: DEFAULT_NAME_SEPARATOR
         set(nameSeparator) = prefs.edit().putString(NAME_SEPARATOR, nameSeparator).apply()

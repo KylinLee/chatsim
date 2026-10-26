@@ -10,7 +10,9 @@ import androidx.core.app.AlarmManagerCompat
 import androidx.room.withTransaction
 import io.github.kylinlee.chatsim.background.ScheduledTaskReceiver
 import io.github.kylinlee.chatsim.common.TASK_ID
+import io.github.kylinlee.chatsim.common.extensions.config
 import io.github.kylinlee.chatsim.common.extensions.getMessagesDB
+import io.github.kylinlee.chatsim.common.extensions.notificationHelper
 import io.github.kylinlee.chatsim.common.extensions.showErrorToast
 import io.github.kylinlee.chatsim.common.isSPlus
 import io.github.kylinlee.chatsim.common.refreshMessages
@@ -137,10 +139,12 @@ object TaskScheduler {
     suspend fun reconcile(context: Context) {
         val db = context.getMessagesDB()
         val now = System.currentTimeMillis()
+        context.config.lastReconcileAt = now
         val tasks = db.ScheduledTasksDao().getAll().mapNotNull { it.toDomain() }
         val actions = TaskReconcilePolicy.plan(tasks, now)
         if (actions.isEmpty()) return
 
+        var missedScheduledMessage = false
         actions.forEach { action ->
             when (action) {
                 is TaskReconcileAction.RegisterAlarm ->
@@ -150,9 +154,13 @@ object TaskScheduler {
                     db.ScheduledTasksDao().markFailed(action.task.id, now, action.reason.name)
                     if (action.task.type == ScheduledTaskType.SEND_MESSAGE) {
                         db.MessagesDao().updateStatus(action.task.id, STATUS_FAILED)
+                        missedScheduledMessage = true
                     }
                 }
             }
+        }
+        if (missedScheduledMessage) {
+            context.notificationHelper.showScheduledMessageMissedNotification()
         }
         refreshMessages()
     }

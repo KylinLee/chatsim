@@ -101,6 +101,12 @@ class SettingsRepositoryImpl @Inject constructor(
             config.keepAliveEnabled = value
         }
 
+    override var lastReconcileAt: Long
+        get() = config.lastReconcileAt
+        set(value) {
+            config.lastReconcileAt = value
+        }
+
     override var useSimpleCharacters: Boolean
         get() = config.useSimpleCharacters
         set(value) {

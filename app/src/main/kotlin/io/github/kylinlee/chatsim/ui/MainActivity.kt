@@ -7,13 +7,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation3.runtime.NavKey
 import io.github.kylinlee.chatsim.common.ROLE_ID
+import io.github.kylinlee.chatsim.data.scheduler.TaskScheduler
 import io.github.kylinlee.chatsim.navigation.DialpadRoute
 import io.github.kylinlee.chatsim.navigation.ThreadRoute
 import io.github.kylinlee.chatsim.repository.RoleRepository
 import io.github.kylinlee.chatsim.ui.theme.SmsMessengerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,6 +46,13 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         pendingRoute.value = parseRoute(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch(Dispatchers.IO) {
+            TaskScheduler.reconcile(applicationContext)
+        }
     }
 
     /** 外部号码：`tel:` 打开拨号盘并预填号码；短信类 scheme 打开对应会话。 */

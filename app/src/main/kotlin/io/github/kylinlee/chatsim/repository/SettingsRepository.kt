@@ -20,6 +20,8 @@ interface SettingsRepository {
 
     var keepAliveEnabled: Boolean
 
+    var lastReconcileAt: Long
+
     var useSimpleCharacters: Boolean
     var enableDeliveryReports: Boolean
     var lockScreenVisibilitySetting: Int

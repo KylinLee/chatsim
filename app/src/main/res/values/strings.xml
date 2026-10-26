@@ -417,6 +417,8 @@
     <string name="background_keep_alive">Background &amp; keep-alive</string>
     <string name="background_health_ok">Background reliability looks good.</string>
     <string name="background_health_issues">%1$d item(s) need attention.</string>
+    <string name="last_background_check">Last background check: %1$s</string>
+    <string name="background_check_never">Never</string>
     <string name="battery_optimization">Battery optimization</string>
     <string name="auto_start">Auto-start / background limits</string>
     <string name="exact_alarm_permission">Alarms &amp; reminders</string>

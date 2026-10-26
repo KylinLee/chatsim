@@ -264,6 +264,17 @@ fun SettingsScreen(
                     )
                 }
                 item {
+                    Text(
+                        text = stringResource(
+                            R.string.last_background_check,
+                            backgroundCheckLabel(state.lastReconcileAt),
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                }
+                item {
                     EntryRow(
                         title = stringResource(R.string.battery_optimization),
                         value = statusLabel(state.backgroundStatus.ignoringBatteryOptimizations),
@@ -518,6 +529,14 @@ private fun statusLabel(allowed: Boolean): String =
 @Composable
 private fun defaultRoleLabel(isDefault: Boolean): String =
     stringResource(if (isDefault) R.string.status_default else R.string.status_not_default)
+
+@Composable
+private fun backgroundCheckLabel(millis: Long): String =
+    if (millis <= 0L) {
+        stringResource(R.string.background_check_never)
+    } else {
+        SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(millis))
+    }
 
 @Composable
 private fun SectionHeader(title: String) {

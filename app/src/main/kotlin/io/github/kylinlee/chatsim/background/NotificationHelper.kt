@@ -34,6 +34,7 @@ import io.github.kylinlee.chatsim.ui.MainActivity
 
 private const val MISSED_CALL_NOTIFICATION_CHANNEL = "simple_sms_messenger_missed_calls"
 private const val MISSED_CALL_NOTIFICATION_ID = 43
+private const val SCHEDULED_MISSED_NOTIFICATION_ID = 44
 
 class NotificationHelper(private val context: Context) {
 
@@ -297,6 +298,36 @@ class NotificationHelper(private val context: Context) {
 
     fun cancelMissedCallNotification() {
         notificationManager.cancel(MISSED_CALL_NOTIFICATION_ID)
+    }
+
+    @SuppressLint("NewApi")
+    fun showScheduledMessageMissedNotification() {
+        maybeCreateChannel(name = context.getString(R.string.channel_received_sms))
+
+        val contentIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.let { launchIntent ->
+            PendingIntent.getActivity(
+                context,
+                SCHEDULED_MISSED_NOTIFICATION_ID,
+                launchIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+        val text = context.getString(R.string.scheduled_message_missed_text)
+        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
+            .setContentTitle(context.getString(R.string.scheduled_message_missed_title))
+            .setContentText(text)
+            .setColor(context.getProperPrimaryColor())
+            .setSmallIcon(R.drawable.ic_symbol_schedule)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(Notification.DEFAULT_LIGHTS)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setAutoCancel(true)
+            .setChannelId(NOTIFICATION_CHANNEL)
+
+        contentIntent?.let { builder.setContentIntent(it) }
+
+        notificationManager.notify(SCHEDULED_MISSED_NOTIFICATION_ID, builder.build())
     }
 
     private fun maybeCreateMissedCallChannel() {

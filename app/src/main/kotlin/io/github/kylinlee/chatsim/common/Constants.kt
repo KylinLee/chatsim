@@ -20,6 +20,7 @@ const val CALL_OVERLAY = "call_overlay"
 const val CALL_OVERLAY_X = "call_overlay_x"
 const val CALL_OVERLAY_Y = "call_overlay_y"
 const val KEEP_ALIVE_ENABLED = "keep_alive_enabled"
+const val LAST_RECONCILE_AT = "last_reconcile_at"
 const val NAME_SEPARATOR = "name_separator"
 
 const val TAB_CONTACTS = 1

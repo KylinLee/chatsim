@@ -419,6 +419,8 @@
     <string name="background_keep_alive">后台与保活</string>
     <string name="background_health_ok">后台可靠性良好。</string>
     <string name="background_health_issues">有 %1$d 项需要处理。</string>
+    <string name="last_background_check">上次后台自愈：%1$s</string>
+    <string name="background_check_never">尚未执行</string>
     <string name="battery_optimization">电池优化</string>
     <string name="auto_start">自启动 / 后台限制</string>
     <string name="exact_alarm_permission">闹钟和提醒</string>
