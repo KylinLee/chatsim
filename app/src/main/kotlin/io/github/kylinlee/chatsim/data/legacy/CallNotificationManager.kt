@@ -116,10 +116,7 @@ class CallNotificationManager(private val context: Context) {
                 .setOnlyAlertOnce(true)
                 .setUsesChronometer(callState == Call.STATE_ACTIVE)
                 .setChannelId(channelId)
-
-            if (isRinging) {
-                builder.setFullScreenIntent(openAppPendingIntent, true)
-            }
+                .setFullScreenIntent(openAppPendingIntent, isRinging)
 
             val notification = builder.build()
             // it's rare but possible for the call state to change by now
