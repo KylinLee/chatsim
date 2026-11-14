@@ -6,6 +6,7 @@ import android.os.SystemClock
 import io.github.kylinlee.chatsim.data.events.AppEventBus
 import io.github.kylinlee.chatsim.domain.ContactFilter
 import io.github.kylinlee.chatsim.domain.ConversationMerger
+import io.github.kylinlee.chatsim.domain.UnreadScroll
 import io.github.kylinlee.chatsim.domain.model.AppEvent
 import io.github.kylinlee.chatsim.domain.model.CallRecord
 import io.github.kylinlee.chatsim.domain.model.ConversationThread
@@ -42,6 +43,12 @@ class ConversationsViewModel @Inject constructor(
 
     private val _unreadCount = MutableStateFlow(0)
     val unreadCount: StateFlow<Int> = _unreadCount.asStateFlow()
+
+    private val _unreadScrollRequest = MutableStateFlow<UnreadScrollRequest?>(null)
+    val unreadScrollRequest: StateFlow<UnreadScrollRequest?> = _unreadScrollRequest.asStateFlow()
+
+    private var lastScrolledUnreadId: Long? = null
+    private var unreadScrollSeq = 0
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -151,6 +158,13 @@ class ConversationsViewModel @Inject constructor(
     fun getThread(conversationId: Long): ConversationThread? =
         _conversations.value.firstOrNull { it.conversationId == conversationId }
 
+    fun scrollToNextUnread() {
+        val unreadIds = _conversations.value.filterNot { it.read }.map { it.conversationId }
+        val targetId = UnreadScroll.nextUnreadId(unreadIds, lastScrolledUnreadId) ?: return
+        lastScrolledUnreadId = targetId
+        _unreadScrollRequest.value = UnreadScrollRequest(targetId, ++unreadScrollSeq)
+    }
+
     fun pinConversation(conversationId: Long) {
         conversationRepository.pinConversation(conversationId)
         updatePinnedState(conversationId, isPinned = true)
@@ -231,3 +245,8 @@ class ConversationsViewModel @Inject constructor(
         private const val MIN_LOADING_DURATION_MS = 700L
     }
 }
+
+data class UnreadScrollRequest(
+    val conversationId: Long,
+    val seq: Int,
+)

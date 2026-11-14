@@ -10,6 +10,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import android.content.Intent
 import android.net.Uri
+import android.os.SystemClock
 import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
@@ -144,7 +146,21 @@ fun ChatSimApp(
         backStack.lastOrNull() is UserRulesRoute ||
         backStack.lastOrNull() is UserRuleRecordsRoute
 
+    val doubleTapTimeoutMs = LocalViewConfiguration.current.doubleTapTimeoutMillis
+    var lastMessagesTabTapAt by remember { mutableStateOf(0L) }
+
     val switchTab: (HomeTab) -> Unit = { tab ->
+        if (tab == HomeTab.Messages && unreadCount > 0) {
+            val now = SystemClock.uptimeMillis()
+            if (now - lastMessagesTabTapAt in 0L..doubleTapTimeoutMs) {
+                lastMessagesTabTapAt = 0L
+                conversationsViewModel.scrollToNextUnread()
+            } else {
+                lastMessagesTabTapAt = now
+            }
+        } else {
+            lastMessagesTabTapAt = 0L
+        }
         val route: NavKey = when (tab) {
             HomeTab.Contacts -> ContactsRoute
             HomeTab.Manage -> UserRuleRecordsRoute

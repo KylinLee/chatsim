@@ -36,6 +36,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -76,6 +77,10 @@ fun ConversationsScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val roles by viewModel.roles.collectAsStateWithLifecycle()
     val selectedRoleId by viewModel.selectedRoleId.collectAsStateWithLifecycle()
+    val unreadScrollRequest by viewModel.unreadScrollRequest.collectAsStateWithLifecycle()
+
+    val listState = rememberLazyListState()
+    var appliedScrollSeq by rememberSaveable { mutableIntStateOf(0) }
 
     var searchActive by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -91,6 +96,15 @@ fun ConversationsScreen(
     // 重新进入列表（如从会话返回）时按本地数据刷新，保证定时消息的排序与摘要即时生效
     LaunchedEffect(Unit) {
         viewModel.reloadConversations()
+    }
+
+    LaunchedEffect(unreadScrollRequest, conversations) {
+        val request = unreadScrollRequest ?: return@LaunchedEffect
+        if (request.seq <= appliedScrollSeq) return@LaunchedEffect
+        val index = conversations.indexOfFirst { it.conversationId == request.conversationId }
+        if (index < 0) return@LaunchedEffect
+        appliedScrollSeq = request.seq
+        listState.animateScrollToItem(index)
     }
 
     Scaffold(
@@ -224,7 +238,6 @@ fun ConversationsScreen(
                     }
 
                     else -> {
-                        val listState = rememberLazyListState()
                         LaunchedEffect(listState.isScrollInProgress) {
                             if (listState.isScrollInProgress) {
                                 revealedThreadId = null
