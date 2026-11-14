@@ -142,8 +142,9 @@ class SmsReceiver : BroadcastReceiver() {
             photoUri = photoUri,
         )
 
+        val unreadConversations = context.conversationsDB.getUnreadConversations()
         try {
-            context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
+            context.updateUnreadCountBadge(unreadConversations)
         } catch (ignored: Exception) {
         }
 
@@ -174,7 +175,7 @@ class SmsReceiver : BroadcastReceiver() {
         context.messagesDB.insertOrUpdate(message)
         UserRuleExecutor.applyToStored(context, message.id, ruleOutcome, ruleRecord, senderName)
         refreshMessages()
-        context.showReceivedMessageNotification(newMessageId, peerNumber, body, conversationId, resolved.role.id, bitmap, resolved.role.label)
+        context.showReceivedMessageNotification(newMessageId, peerNumber, body, conversationId, resolved.role.id, bitmap, resolved.role.label, unreadCount = unreadConversations.size)
     }
 
     private companion object {

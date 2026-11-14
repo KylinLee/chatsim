@@ -94,8 +94,9 @@ class MmsReceiver : MmsReceivedReceiver() {
                     )
                     context.messagesDB.insertOrUpdate(mms.copy(conversationId = conversationId))
                     UserRuleExecutor.applyToStored(context, mms.id, ruleOutcome, ruleRecord, senderName)
-                    context.showReceivedMessageNotification(mms.id, resolved.peerNumber, mms.body, conversationId, resolved.role.id, bitmap, resolved.role.label)
-                    context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
+                    val unreadConversations = context.conversationsDB.getUnreadConversations()
+                    context.showReceivedMessageNotification(mms.id, resolved.peerNumber, mms.body, conversationId, resolved.role.id, bitmap, resolved.role.label, unreadCount = unreadConversations.size)
+                    context.updateUnreadCountBadge(unreadConversations)
                     refreshMessages()
                 }
             }

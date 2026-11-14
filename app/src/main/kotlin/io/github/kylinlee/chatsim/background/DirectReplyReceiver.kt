@@ -66,6 +66,12 @@ class DirectReplyReceiver : BroadcastReceiver() {
                 context.showErrorToast(e)
             }
 
+            val ids = context.messagesDB.getConversationMessageIds(conversationId)
+            context.markMessagesRead(ids)
+            context.conversationsDB.markRead(conversationId)
+            val unreadConversations = context.conversationsDB.getUnreadConversations()
+            context.updateUnreadCountBadge(unreadConversations)
+
             val photoUri = SimpleContactsHelper(context).getPhotoUriFromPhoneNumber(conversation.peerNumber)
             val bitmap = context.getNotificationBitmap(photoUri)
             Handler(Looper.getMainLooper()).post {
@@ -77,14 +83,11 @@ class DirectReplyReceiver : BroadcastReceiver() {
                     role?.id ?: conversation.roleId,
                     bitmap,
                     sender = null,
-                    alertOnlyOnce = true
+                    alertOnlyOnce = true,
+                    unreadCount = unreadConversations.size,
                 )
             }
 
-            val ids = context.messagesDB.getConversationMessageIds(conversationId)
-            context.markMessagesRead(ids)
-            context.conversationsDB.markRead(conversationId)
-            context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
             refreshMessages()
         }
     }

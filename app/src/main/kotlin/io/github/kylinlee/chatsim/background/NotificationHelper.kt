@@ -54,7 +54,8 @@ class NotificationHelper(private val context: Context) {
         bitmap: Bitmap?,
         sender: String?,
         roleLabel: String = "",
-        alertOnlyOnce: Boolean = false
+        alertOnlyOnce: Boolean = false,
+        unreadCount: Int = 0,
     ) {
         maybeCreateChannel(name = context.getString(R.string.channel_received_sms))
 
@@ -146,6 +147,7 @@ class NotificationHelper(private val context: Context) {
             setAutoCancel(true)
             setOnlyAlertOnce(alertOnlyOnce)
             setSound(soundUri, AudioManager.STREAM_NOTIFICATION)
+            setNumber(unreadCount)
         }
 
         if (replyAction != null && context.config.lockScreenVisibilitySetting == LOCK_SCREEN_SENDER_MESSAGE) {

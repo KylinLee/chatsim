@@ -912,9 +912,10 @@ fun Context.showReceivedMessageNotification(
     roleId: Long,
     bitmap: Bitmap?,
     roleLabel: String = "",
+    unreadCount: Int = 0,
 ) {
     val senderName = getNameFromAddress(address)
-    notificationHelper.showMessageNotification(messageId, address, body, conversationId, roleId, bitmap, senderName, roleLabel)
+    notificationHelper.showMessageNotification(messageId, address, body, conversationId, roleId, bitmap, senderName, roleLabel, unreadCount = unreadCount)
 }
 
 fun Context.getNameFromAddress(address: String): String {
